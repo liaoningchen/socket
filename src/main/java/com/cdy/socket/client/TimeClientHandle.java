@@ -19,17 +19,20 @@ public class TimeClientHandle implements Runnable{
     private volatile boolean stop;
 
     @SneakyThrows
-    public TimeClientHandle(String host,int port){
+    public TimeClientHandle(String host,Integer port){
         this.host = host == null?"127.0.0.1":host;
-        this.port = port;
+        this.port = port == null?12345:port;
         selector = Selector.open();
         socketChannel = SocketChannel.open();
         socketChannel.configureBlocking(false);
+        assert host != null;
+        assert port != null;
+        socketChannel.connect(new InetSocketAddress(host,port));
+        socketChannel.register(selector,SelectionKey.OP_CONNECT);
     }
 
     @SneakyThrows
     public void run(){
-        doConnect();
         while(!stop){
             selector.select();
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
@@ -41,12 +44,7 @@ public class TimeClientHandle implements Runnable{
                 try{
                     handleInput(key);
                 }catch (Exception e){
-                    if(key != null){
-                        key.cancel();
-                        if(key.channel() !=null){
-                            key.channel().close();
-                        }
-                    }
+                    closeChannel(key);
                 }
             }
         }
@@ -55,10 +53,20 @@ public class TimeClientHandle implements Runnable{
         }
     }
 
+    private void closeChannel(SelectionKey key) throws IOException {
+        if(key != null){
+            key.cancel();
+            if(key.channel() !=null){
+                key.channel().close();
+            }
+        }
+    }
+
     private void handleInput(SelectionKey key) throws IOException{
+        //判断此建是否有效
         if(key.isValid()){
-            //判断是否连接成功
             SocketChannel sc = (SocketChannel)key.channel();
+            //判断是否连接成功
             if(key.isConnectable()){
                 if(sc.finishConnect()){
                     sc.register(selector,SelectionKey.OP_READ);
@@ -67,6 +75,7 @@ public class TimeClientHandle implements Runnable{
                     System.exit(1);//连接失败，进程退出
                 }
             }
+            //判断此键通道是否已准备好进行读取操作
             if(key.isReadable()) {
                 ByteBuffer readBuffer = ByteBuffer.allocate(1024);
                 int readBytes = sc.read(readBuffer);
@@ -90,7 +99,7 @@ public class TimeClientHandle implements Runnable{
 
     private void doConnect() throws IOException{
         if(socketChannel.connect(new InetSocketAddress(host,port))){
-            socketChannel.register(selector,SelectionKey.OP_READ);
+            SelectionKey register = socketChannel.register(selector, SelectionKey.OP_READ);
             doWrite(socketChannel);
         }else{
             socketChannel.register(selector,SelectionKey.OP_CONNECT);
