@@ -20,14 +20,14 @@ import java.util.Set;
  * @author chendeyou
  * @date 2020/7/18 16:27
  */
-public class TCPReactor implements Runnable{
+public class SocketServer implements Runnable{
 
     private ServerSocketChannel serverSocketChannel ;
     private Selector selector;
 
 
     @SneakyThrows
-    public TCPReactor(Integer port) {
+    public SocketServer(Integer port) {
         //服务端socket
         this.serverSocketChannel = ServerSocketChannel.open();
         //创建选择器对象
