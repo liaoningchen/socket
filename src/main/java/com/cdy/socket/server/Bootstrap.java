@@ -6,7 +6,7 @@ package com.cdy.socket.server;
  */
 public class Bootstrap {
     public static void main(String[] args) {
-        SocketServer tcpReactor = new SocketServer(1234);
-        tcpReactor.run();
+        SocketServer socketServer = new SocketServer(1234);
+        socketServer.run();
     }
 }

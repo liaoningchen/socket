@@ -52,7 +52,6 @@ public class SocketServer implements Runnable{
             System.out.println("准备接收连接。。。。。。。。。。。。。。。。。");
             //selector.select() 是阻塞的    判断是否有感兴趣的事件发生，这里事件指的是上边注册的事件(accept)
             selector.select();
-            System.out.println("有请求数据进来了");
             Set<SelectionKey> selectionKeys = selector.selectedKeys();
             Iterator<SelectionKey> iterator = selectionKeys.iterator();
             while (iterator.hasNext()){

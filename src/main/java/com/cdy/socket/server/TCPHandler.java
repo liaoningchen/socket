@@ -50,10 +50,7 @@ public class TCPHandler implements Runnable{
     @SneakyThrows
     private String hanlder(String str){
         System.out.println("请求数据:"+str);
-
-        System.out.println("业务处理开始。。。。。。。。。。。。。");
         Thread.sleep(500L);
-        System.out.println("业务处理结束。。。。。。。。。。。。。");
         return "数据处理完成:"+str+System.currentTimeMillis();
     }
 }

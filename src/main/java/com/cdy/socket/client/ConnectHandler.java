@@ -33,13 +33,13 @@ public class ConnectHandler implements Runnable {
         }
     }
     private void doWrite(SocketChannel sc) throws IOException {
-        byte[] bytes = "QUERY TIME ORDER".getBytes();
+        byte[] bytes = "hello world".getBytes();
         ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
         writeBuffer.put(bytes);
         writeBuffer.flip();
         sc.write(writeBuffer);
         if (!writeBuffer.hasRemaining()){
-            System.out.println("Send order 2 server succeed.");
+            System.out.println("客户端数据发送成功");
         }
     }
 }
